@@ -1,0 +1,63 @@
+name: Central Security Scan
+
+on:
+  workflow_call:
+    inputs:
+      language:
+        required: true
+        type: string
+
+jobs:
+  security-checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      ### ───── Setup Runtime Based on Language ─────
+      - name: Setup Node.js
+        if: inputs.language == 'node'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Python
+        if: inputs.language == 'python'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies (Node)
+        if: inputs.language == 'node'
+        run: npm ci
+
+      - name: Install dependencies (Python)
+        if: inputs.language == 'python'
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt || true
+
+      ### ───── Run Semgrep ─────
+      - name: Run Semgrep
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: 'auto'  # Use 'p/ci' or custom config if preferred
+
+      ### ───── Run TruffleHog ─────
+      - name: Run TruffleHog
+        uses: trufflesecurity/trufflehog@v3
+        with:
+          path: .
+
+      ### ───── Run Snyk Scan ─────
+      - name: Authenticate Snyk
+        run: snyk auth ${{ secrets.SNYK_TOKEN }}
+
+      - name: Run Snyk test
+        run: snyk test --all-projects
+        continue-on-error: true
+
+      - name: Run Snyk monitor (optional)
+        run: snyk monitor --all-projects
+        continue-on-error: true
