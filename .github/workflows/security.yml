@@ -44,40 +44,34 @@ jobs:
           pip install -r requirements.txt || true
 
       ### ───── Run Semgrep ─────
-      - name: Run Semgrep
+      - name: Run Semgrep with SARIF output
         uses: returntocorp/semgrep-action@v1
         with:
-          config: 'auto'  # Use 'p/ci' or custom config if preferred
-          args: --json --output=semgrep.json          
+          config: auto
+          args: --sarif --output=semgrep.sarif
         continue-on-error: true
-        
-      - name: Upload Semgrep Results
-        uses: actions/upload-artifact@v4
+      
+      - name: Upload SARIF to GitHub
+        uses: github/codeql-action/upload-sarif@v2
         with:
-          name: semgrep-report
-          path: semgrep-results.json
+          sarif_file: semgrep.sarif
 
       ### ───── Run TruffleHog ─────
       - name: Run TruffleHog
         uses: trufflesecurity/trufflehog@main
         with:
-          scanArguments: --source=git file://. --fail          
+          path: .
+          extra_args: --source=git file://. --fail         
 
       ### ───── Run Snyk Scan ─────
 
-      - name: Snyk all-projects JSON
+      - name: Snyk test
         uses: snyk/actions/node@master
         with:
-          args: test --all-projects --json-file-output=snyk-report.json        
+          args: test --all-projects --sarif-file-output=snyk.sarif
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         continue-on-error: true
-      
-      - name: Upload Snyk JSON
-        uses: actions/upload-artifact@v4
-        with:
-          name: snyk-json-report
-          path: snyk-report.json
 
       - name: Snyk monitor all projects
         uses: snyk/actions/node@master
