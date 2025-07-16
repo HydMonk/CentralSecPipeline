@@ -6,6 +6,9 @@ on:
       language:
         required: true
         type: string
+    secrets:
+      SNYK_TOKEN:
+        required: true
 
 jobs:
   security-checks:
