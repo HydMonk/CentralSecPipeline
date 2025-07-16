@@ -67,15 +67,19 @@ jobs:
       - name: Run Snyk test
         uses: snyk/actions/node@master
         with:
-          args: test --all-projects --sarif-file-output=snyk.sarif
+          args: test --sarif-file-output=snyk.sarif
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         continue-on-error: true
 
+      - name: Merge SARIF files (optional)
+        run: |
+          jq -s 'reduce .[] as $item ({}; . + $item)' snyk-*.sarif > snyk-merged.sarif
+      
       - name: Upload Snyk SARIF
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: snyk.sarif
+          sarif_file: snyk-merged.sarif
 
       - name: Snyk monitor all projects
         uses: snyk/actions/node@master
