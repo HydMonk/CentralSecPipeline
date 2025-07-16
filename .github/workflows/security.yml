@@ -46,7 +46,7 @@ jobs:
         uses: returntocorp/semgrep-action@v1
         with:
           config: 'auto'  # Use 'p/ci' or custom config if preferred
-          continue-on-error: true
+        continue-on-error: true
 
       ### ───── Run TruffleHog ─────
       - name: Run TruffleHog
