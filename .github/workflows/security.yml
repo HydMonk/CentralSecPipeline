@@ -46,8 +46,7 @@ jobs:
         uses: returntocorp/semgrep-action@v1
         with:
           config: 'auto'  # Use 'p/ci' or custom config if preferred
-          json: true
-          output: semgrep-results.json
+          args: --json --output=semgrep.json          
         continue-on-error: true
         
       - name: Upload Semgrep Results
