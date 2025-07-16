@@ -43,18 +43,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt || true
 
+      - name: Install Semgrep
+        run: pip install semgrep
+   
+
       ### ───── Run Semgrep ─────
-      - name: Run Semgrep
-        uses: returntocorp/semgrep-action@v1
-        with:
-          config: auto
-          args: --sarif --output=semgrep.sarif
+      - name: Run Semgrep (free, local scan)
+        run: |
+          semgrep --config=auto --sarif --output=semgrep.sarif || true
         continue-on-error: true
       
-      - name: Upload Semgrep SARIF to GitHub
-        uses: github/codeql-action/upload-sarif@v2
+      - name: Upload SARIF to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: semgrep.sarif
+
 
       ### ───── Run TruffleHog ─────
       - name: Run TruffleHog
