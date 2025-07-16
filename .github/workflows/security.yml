@@ -66,7 +66,9 @@ jobs:
       ### ───── Run Snyk Scan ─────
 
       - name: Snyk all-projects JSON
-        run: snyk test --all-projects --json-file-output=snyk-report.json
+        uses: snyk/actions/node@master
+        with:
+          args: test --all-projects --json-file-output=snyk-report.json        
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         continue-on-error: true
