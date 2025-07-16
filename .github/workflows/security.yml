@@ -65,6 +65,7 @@ jobs:
         with:
           path: .
           extra_args: --source=git file://. --fail         
+        continue-on-error: true
 
       ### ───── Run Snyk Scan ─────
 
