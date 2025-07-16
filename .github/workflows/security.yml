@@ -57,7 +57,7 @@ jobs:
       ### ───── Run Snyk Scan ─────
 
       - name: Run Snyk test
-        uses: snyk/actions/node@main
+        uses: snyk/actions/node@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         continue-on-error: true
