@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       ### ───── Setup Runtime Based on Language ─────
       - name: Setup Node.js
@@ -59,7 +61,7 @@ jobs:
       - name: Run TruffleHog
         uses: trufflesecurity/trufflehog@main
         with:
-          path: .          
+          scanArguments: --source=git file://. --fail          
 
       ### ───── Run Snyk Scan ─────
 
